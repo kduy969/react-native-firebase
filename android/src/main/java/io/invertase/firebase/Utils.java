@@ -11,6 +11,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import com.facebook.react.bridge.ReadableArray;
@@ -150,7 +151,16 @@ public class Utils {
         appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
           && appProcess.processName.equals(packageName)
         ) {
-        return true;
+        ReactContext reactContext;
+
+        try {
+          reactContext = (ReactContext) context;
+        } catch (ClassCastException exception) {
+          // Not react context so default to true
+          return true;
+        }
+
+        return reactContext.getLifecycleState() == LifecycleState.RESUMED;
       }
     }
 
